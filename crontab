@@ -1,0 +1,9 @@
+#Parse apache logs and send results to Zabbix. See HTML Status items graphics and templates
+ACCESSLOG=/var/log/httpd/access_log
+OFFSET=/var/lib/zabbix/offset
+*/15 * * * * tail -c  +$(K=`cat $OFFSET || echo 0`; [ $K -gt `stat -c \%s $ACCESSLOG| tee $OFFSET` ] && echo 0 || echo $K) $ACCESSLOG |cut -d' ' -f9| cut -c1| sort |uniq -c| while read n c; do if [ -n "$c" ]; then zabbix_sender -z ezi-mon-001 -s $(hostname -f) -k active.webcode[${c}XX] -o $n 1>/dev/null; fi; done
+
+#Send OSSEC connectivity status to Zabbix server
+#Please note Zabbix hostnames must be equal to OSSEC host Name: in output of syscheck_control -l
+*/5 *  * * * /var/ossec/bin/syscheck_control -l | while IFS=',' read -r id name ip state; do if [ -n "$name" ]; then /usr/bin/zabbix_sender -z ezi-mon-001 -k active.agent.osseccon -s `echo $name | cut -d' ' -f2` -o "$state" > /dev/null; fi; done
+
