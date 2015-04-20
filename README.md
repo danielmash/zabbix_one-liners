@@ -1,6 +1,6 @@
 # zabbix_one-liners
 
-Active Monitoring.
+#Active Monitoring.
 "Active" means when Zabbix server received some data from monitored hosts but not initiate these checks.
 Apache access log. Monitor HTTP status codes
 A script running from cron every minute. It calculates offset and  store it in file. Every time called tail processed only last portion of access.log which is good for performance. Also we use system unilities which improve parsing speed to 0.7 sec per 100MB (grep -E takes 3 sec). Comparing with zbal scripts this one calculates statistics all at one shot and agent don't have to run it again for each type of HTTP status code.
@@ -14,7 +14,7 @@ In Zabbix create items as type: zabbix trapper, key:  active.webcode[2XX] etc.; 
 Create triggers:
 Create graphs:
  
-Monitor MySQL database status.
+#Monitor MySQL database status.
 This script will send all the MySQL status variables (its a WIP so might be non functioning).
 #!/bin/bash 
 echo "show global status" | mysql -N -uroot -pMYSQL_PASSWORD | awk -F'\t' '{ printf("- "); printf("mysql.status[\"%s\"]",$1); printf(" \"%s\"",$2); print ""; }' | zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -i - | grep sent | awk '{ print $2 }' | sed 's/;$//' echo "show variables" | mysql -N -pMYSQL_PASSWORD | awk -F'\t' '{ printf("- "); printf("mysql.var[\"%s\"]",$1); printf(" \"%s\"",$2); print ""; }' | zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -vv -i -
