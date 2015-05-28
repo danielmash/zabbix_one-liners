@@ -7,3 +7,16 @@ OFFSET=/var/lib/zabbix/offset
 #Please note Zabbix hostnames must be equal to OSSEC host Name: in output of syscheck_control -l
 */5 *  * * * /var/ossec/bin/syscheck_control -l | while IFS=',' read -r id name ip state; do if [ -n "$name" ]; then /usr/bin/zabbix_sender -z zabbix_host -k active.agent.osseccon -s `echo $name | cut -d' ' -f2` -o "$state" > /dev/null; fi; done
 
+#I have script ready to test CIS audit with Lynis. Runs daily via cron and actively sends number of warnings to Zabbix.
+0 0 * * *	lynis --check-all --quick --quiet --no-colors | wc –l | zabbix_sender -z zabbix-server.local -k active.agent.lynis
+#Trigger will be:
+#   Warning: Security audit wants 3 fixes.
+#
+#When manually run:
+#
+#[root@CentOS6-TEST1 ~]# lynis --check-all --quick --quiet --no-colors
+#  - Shellshock: CVE-2014-6277 (segfault, lcamtuf bug #1)      [ WARNING ]
+#    - Checking for unused rules                               [ WARNING ]
+#  - Checking high stratum ntp peers                           [ WARNING ]
+
+
