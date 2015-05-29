@@ -1,3 +1,4 @@
+#crontab
 #Parse apache logs and send results to Zabbix. See HTML Status items graphics and templates
 ACCESSLOG=/var/log/httpd/access_log
 OFFSET=/var/lib/zabbix/offset
